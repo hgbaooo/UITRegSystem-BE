@@ -1,6 +1,14 @@
-"""
-    You should probably add a custom exception handler to your project based on
-    who consumes your APIs. To learn how to create a custom exception handler,
-    you can check out the Django Rest Framework documentation at:
-    https://www.django-rest-framework.org/api-guide/exceptions/#custom-exception-handling
-"""
+# core/exceptions.py
+from rest_framework.exceptions import APIException
+
+class ApiError(APIException):
+    status_code = None
+    default_detail = 'A server error occurred.'
+    default_code = 'error'
+
+    def __init__(self, status_code, detail=None, code=None):
+        self.status_code = status_code
+        if detail is not None:
+            self.detail = detail
+        if code is not None:
+            self.code = code
