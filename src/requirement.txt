@@ -1,0 +1,9 @@
+pandas
+langchain
+faiss-cpu
+sentence-transformers
+scikit-learn
+joblib
+langchain-community
+langchain-huggingface
+Flask

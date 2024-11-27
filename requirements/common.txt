@@ -1,7 +1,0 @@
-djangorestframework
-firebase-admin
-djangorestframework-simplejwt
-python-dotenv
-psycopg2
-dj-database-url
-drf-yasg
