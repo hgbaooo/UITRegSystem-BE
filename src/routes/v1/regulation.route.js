@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 const regulationController = require('../../controllers/regulation.controller');
 
@@ -8,6 +9,7 @@ const regulationController = require('../../controllers/regulation.controller');
  *   post:
  *     summary: Get prediction answer
  *     description: This endpoint receives a question and returns the predicted answer.
+ *     tags: [Regulations]
  *     requestBody:
  *       required: true
  *       content:
