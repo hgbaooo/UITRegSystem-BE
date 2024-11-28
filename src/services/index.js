@@ -4,3 +4,6 @@ module.exports.tokenService = require('./token.service');
 module.exports.userService = require('./user.service');
 module.exports.regulationService = require('./regulation.service');
 module.exports.notificationService = require('./notification.service');
+module.exports.formService = require('./form.service');
+module.exports.formTypeService = require('./formType.service');
+module.exports.firebaseService = require('./firebase.service');

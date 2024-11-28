@@ -4,6 +4,8 @@ const userRoute = require('./user.route');
 const docsRoute = require('./docs.route');
 const regulationRoute = require('./regulation.route');
 const notificationRoute = require('./notification.route');
+const formRoute = require('./form.route');
+const formTypeRoute = require('./formType.route');
 const config = require('../../config/config');
 
 const router = express.Router();
@@ -24,6 +26,14 @@ const defaultRoutes = [
   {
     path: '/notifications',
     route: notificationRoute,
+  },
+  {
+    path: '/forms',
+    route: formRoute,
+  },
+  {
+    path: '/formTypes',
+    route: formTypeRoute,
   },
 ];
 
