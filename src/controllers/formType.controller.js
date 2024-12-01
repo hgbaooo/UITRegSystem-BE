@@ -3,7 +3,7 @@ const catchAsync = require('../utils/catchAsync');
 const { formTypeService } = require('../services');
 
 const createFormType = catchAsync(async (req, res) => {
-  const formType = await formTypeService.createFormType(req.body, req.files);
+  const formType = await formTypeService.createFormType(req.body, req.file);
   res.status(httpStatus.CREATED).send(formType);
 });
 

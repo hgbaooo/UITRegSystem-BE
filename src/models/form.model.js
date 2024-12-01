@@ -15,6 +15,15 @@ const formSchema = new mongoose.Schema(
       ref: 'FormType',
       required: true,
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    createAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { collection: 'forms' }
 );

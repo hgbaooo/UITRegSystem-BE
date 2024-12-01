@@ -32,7 +32,7 @@ const defaultRoutes = [
     route: formRoute,
   },
   {
-    path: '/formTypes',
+    path: '/form-types',
     route: formTypeRoute,
   },
 ];
