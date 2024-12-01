@@ -1,25 +1,13 @@
 const express = require('express');
 const multer = require('multer');
-const httpStatus = require('http-status');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const formTypeValidation = require('../../validations/formType.validation');
 const formTypeController = require('../../controllers/formType.controller');
-const ApiError = require('../../utils/ApiError');
 
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const allowedFileTypes = /jpeg|jpg|png|pdf|doc|docx/;
-    const mimeType = allowedFileTypes.test(file.mimetype);
-    const extname = allowedFileTypes.test(file.originalname.split('.').pop());
-
-    if (mimeType && extname) {
-      return cb(null, true);
-    }
-    cb(new ApiError(httpStatus.BAD_REQUEST, 'Only images, PDFs and Docx files are allowed'));
-  },
 });
 
 const router = express.Router();
@@ -31,17 +19,10 @@ const router = express.Router();
  *   description: Form Type management API
  */
 
-// Create a form type
 router.post(
   '/create-form-type',
   auth('manageFormTypes'),
-  upload.array('files'),
-  (req, res, next) => {
-    if (req.files) {
-      req.body.files = req.files.map((file) => file.filename);
-    }
-    next();
-  },
+  upload.single('file'),
   validate(formTypeValidation.createFormType),
   formTypeController.createFormType
 );
@@ -63,8 +44,8 @@ router.delete('/delete-form-type/:formTypeId', auth('manageFormTypes'), formType
  * @swagger
  * /form-types/create-form-type:
  *   post:
- *     summary: Create a new form type with files upload (URL is generated automatically)
- *     description: Create a new form type with name and files upload. The URL will be generated automatically based on the uploaded files.
+ *     summary: Create a new form type with file upload (URL is generated automatically)
+ *     description: Create a new form type with name and file upload. The URL will be generated automatically based on the uploaded file.
  *     tags: [FormTypes]
  *     security:
  *       - bearerAuth: []
@@ -76,20 +57,18 @@ router.delete('/delete-form-type/:formTypeId', auth('manageFormTypes'), formType
  *             type: object
  *             required:
  *               - name
- *               - files
+ *               - file
  *             properties:
  *               name:
  *                 type: string
  *                 description: The name of the form type.
- *               files:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: binary
- *                 description: Files to be uploaded (e.g., image, PDF, DOCX).
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: File to be uploaded (e.g., image, PDF, DOCX).
  *             example:
  *               name: "Survey Form"
- *               files: [file1.pdf, image1.png]
+ *               file: file1.pdf
  *     responses:
  *       "201":
  *         description: Form type created successfully with generated URLs.
@@ -121,19 +100,18 @@ router.delete('/delete-form-type/:formTypeId', auth('manageFormTypes'), formType
  *       type: object
  *       required:
  *         - name
- *         - files
+ *         - file
  *       properties:
  *         name:
  *           type: string
  *           description: The name of the form type
- *         files:
- *           type: array
- *           items:
- *             type: string
- *             description: List of file URLs generated from the uploaded files
+ *         file:
+ *           type: string
+ *           format: binary
+ *           description: File to be uploaded (e.g., image, PDF, DOCX).
  *       example:
  *         name: "Survey Form"
- *         files: ["https://firebase.com/file1", "https://firebase.com/image1"]
+ *         file: "https://firebase.com/file1"
  */
 
 /**
@@ -152,15 +130,9 @@ router.delete('/delete-form-type/:formTypeId', auth('manageFormTypes'), formType
  *         url:
  *           type: string
  *           description: The URL associated with the form type
- *         files:
- *           type: array
- *           items:
- *             type: string
- *             description: List of file URLs related to the form type
  *       example:
  *         name: "Survey Form"
  *         url: "https://example.com/survey-form"
- *         files: ["https://firebase.com/file1", "https://firebase.com/image1"]
  */
 
 /**

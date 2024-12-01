@@ -4,7 +4,7 @@ const { Form, FormType } = require('../models');
 const ApiError = require('../utils/ApiError');
 const firebaseService = require('./firebase.service');
 
-const createForm = async (formBody, files, userId) => {
+const createForm = async (formBody, file, userId) => {
   try {
     const { formTypeId } = formBody;
 
@@ -12,19 +12,17 @@ const createForm = async (formBody, files, userId) => {
     if (!formType) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid formType ID provided');
     }
+    let fileUrl = null;
 
-    const fileUrls = await Promise.all(files.map((file) => firebaseService.uploadFileToFirebase(file, 'forms', formTypeId)));
-
-    const formattedFiles = files.map((file, index) => ({
-      filename: `${Date.now()}-${file.originalname}`,
-      firebaseUrl: fileUrls[index],
-    }));
+    if (file) {
+      fileUrl = await firebaseService.uploadFileToFirebase(file, 'forms', formBody.name);
+    }
 
     const newForm = new Form({
+      name: formBody.name,
+      formTypeId: formBody.formTypeId,
+      url: fileUrl,
       userId,
-      formTypeId,
-      files: formattedFiles,
-      url: fileUrls[0],
       createdAt: Date.now(),
     });
 

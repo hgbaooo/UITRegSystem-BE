@@ -1,25 +1,13 @@
 const express = require('express');
 const multer = require('multer');
-const httpStatus = require('http-status');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const formValidation = require('../../validations/form.validation');
 const formController = require('../../controllers/form.controller');
-const ApiError = require('../../utils/ApiError');
 
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const allowedFileTypes = /jpeg|jpg|png|pdf|doc|docx/;
-    const mimeType = allowedFileTypes.test(file.mimetype);
-    const extname = allowedFileTypes.test(file.originalname.split('.').pop());
-
-    if (mimeType && extname) {
-      return cb(null, true);
-    }
-    cb(new ApiError(httpStatus.BAD_REQUEST, 'Only images, PDFs and Docx are allowed'));
-  },
 });
 
 const router = express.Router();
@@ -34,13 +22,7 @@ const router = express.Router();
 router.post(
   '/create-form',
   auth('manageForms'),
-  upload.array('files'),
-  (req, res, next) => {
-    if (req.files) {
-      req.body.files = req.files.map((file) => file.filename);
-    }
-    next();
-  },
+  upload.single('file'),
   validate(formValidation.createForm),
   formController.createForm
 );
@@ -57,8 +39,8 @@ router.delete('/delete-form/:formId', auth('manageForms'), formController.delete
  * @swagger
  * /forms/create-form:
  *   post:
- *     summary: Create a form with optional files
- *     description: Only authorized users can create forms with optional file uploads (images, PDFs, and Docx).
+ *     summary: Create a form with an optional file
+ *     description: Only authorized users can create forms with an optional file upload (image, PDF, Docx).
  *     tags: [Forms]
  *     security:
  *       - bearerAuth: []
@@ -69,25 +51,26 @@ router.delete('/delete-form/:formId', auth('manageForms'), formController.delete
  *           schema:
  *             type: object
  *             required:
- *               - title
- *               - description
+ *               - name
+ *               - formTypeId  # formTypeId is now required
  *             properties:
- *               title:
+ *               name:
  *                 type: string
- *                 description: Title of the form.
- *               files:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: binary
- *                 description: List of files to be uploaded (images, PDFs, Docx).
+ *                 description: The name of the form.
+ *               formTypeId:
+ *                 type: string
+ *                 description: The ID of the form type.
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: A single file to be uploaded (image, PDF, or Docx).
  *             example:
- *               title: Sample Form
- *               description: This is a sample form description.
- *               files: []
+ *               name: Sample Form
+ *               formTypeId: 605c72ef1532071f1c1d8f3c
+ *               file: null
  *     responses:
  *       "201":
- *         description: Form created successfully, including files.
+ *         description: Form created successfully, including the file.
  *         content:
  *           application/json:
  *             schema:
@@ -96,11 +79,9 @@ router.delete('/delete-form/:formId', auth('manageForms'), formController.delete
  *                 message:
  *                   type: string
  *                   example: "Form created successfully"
- *                 files:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example: ["file1.jpg", "file2.pdf"]
+ *                 file:
+ *                   type: string
+ *                   example: "file1.jpg"
  *       "400":
  *         description: Bad Request - Validation or file upload error.
  *       "401":
