@@ -1,7 +1,6 @@
 const { spawn } = require('child_process');
 
 const getAnswerFromPython = (question) => {
-  console.log(`Sending question to Python: ${question}`);
   return new Promise((resolve, reject) => {
     const pythonProcess = spawn(
       'D:\\Documents\\UniversityDocuments\\HocKi5\\DA1\\BE\\TrainingModel\\venv\\Scripts\\python.exe',
@@ -9,7 +8,6 @@ const getAnswerFromPython = (question) => {
     );
 
     pythonProcess.stdout.on('data', (data) => {
-      console.log(`Received from Python: ${data.toString().trim()}`);
       try {
         const output = JSON.parse(data.toString().trim());
         resolve(output);
@@ -18,8 +16,7 @@ const getAnswerFromPython = (question) => {
       }
     });
 
-    pythonProcess.stderr.on('data', (data) => {
-      console.error(`stderr: ${data.toString()}`);
+    pythonProcess.stderr.on('data', () => {
       reject(new Error('Error occurred while processing the prediction.'));
     });
 
@@ -29,8 +26,7 @@ const getAnswerFromPython = (question) => {
       }
     });
 
-    pythonProcess.on('error', (err) => {
-      console.error('Failed to start subprocess.', err);
+    pythonProcess.on('error', () => {
       reject(new Error('Failed to start Python process.'));
     });
   });
