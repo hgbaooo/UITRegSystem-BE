@@ -6,6 +6,10 @@ const formSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    description: {
+      type: String,
+      required: true,
+    },
     url: {
       type: String,
       required: true,
@@ -13,11 +17,6 @@ const formSchema = new mongoose.Schema(
     formTypeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'FormType',
-      required: true,
-    },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
       required: true,
     },
     createAt: {

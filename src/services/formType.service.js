@@ -2,24 +2,10 @@ const httpStatus = require('http-status');
 const { ObjectId } = require('mongoose').Types;
 const { FormType } = require('../models');
 const ApiError = require('../utils/ApiError');
-const firebaseService = require('./firebase.service');
 
-const createFormType = async (formTypeBody, files) => {
+const createFormType = async (formTypeBody) => {
   try {
-    let fileUrl = null;
-
-    if (files) {
-      fileUrl = await firebaseService.uploadFileToFirebase(files, 'formTypes', formTypeBody.name);
-    }
-
-    const newFormType = new FormType({
-      name: formTypeBody.name,
-      description: formTypeBody.description,
-      url: fileUrl,
-    });
-
-    await newFormType.save();
-    return newFormType;
+    return await FormType.create(formTypeBody);
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -40,10 +26,10 @@ const getAllFormTypes = async () => {
 };
 
 const getFormTypeById = async (formTypeId) => {
+  if (!ObjectId.isValid(formTypeId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid document ID');
+  }
   try {
-    if (!ObjectId.isValid(formTypeId)) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid document ID');
-    }
     const formType = await FormType.findById(formTypeId);
     if (!formType) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Form type not found');
@@ -58,13 +44,14 @@ const getFormTypeById = async (formTypeId) => {
 };
 
 const updateFormTypeById = async (formTypeId, updateBody) => {
+  if (!ObjectId.isValid(formTypeId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid document ID');
+  }
   try {
-    if (!ObjectId.isValid(formTypeId)) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid document ID');
+    const formType = await FormType.findByIdAndUpdate(formTypeId, { $set: updateBody }, { new: true, runValidators: true });
+    if (!formType) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Form type not found');
     }
-    const formType = await getFormTypeById(formTypeId);
-    Object.assign(formType, updateBody);
-    await formType.save();
     return formType;
   } catch (error) {
     if (error instanceof ApiError) {
@@ -75,12 +62,14 @@ const updateFormTypeById = async (formTypeId, updateBody) => {
 };
 
 const deleteFormTypeById = async (formTypeId) => {
+  if (!ObjectId.isValid(formTypeId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid document ID');
+  }
   try {
-    if (!ObjectId.isValid(formTypeId)) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid document ID');
+    const formType = await FormType.findByIdAndDelete(formTypeId);
+    if (!formType) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Form type not found');
     }
-    const formType = await getFormTypeById(formTypeId);
-    await formType.remove();
     return formType;
   } catch (error) {
     if (error instanceof ApiError) {

@@ -39,6 +39,24 @@ components:
         refresh:
           $ref: '#/components/schemas/Token'
 
+    FormType:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        createAt:
+          type: string
+          format: date-time
+      example:
+        id: 5f47ac10b54764421b7163e1
+        name: Form Type Example
+        description: This is a sample description for a form type
+        createAt: 2025-01-01T10:00:00.000Z'
+
     Error:
       type: object
       properties:
@@ -84,6 +102,16 @@ components:
           example:
             code: 404
             message: Not found
+
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 400
+            message: Invalid request parameters
 
   securitySchemes:
     bearerAuth:

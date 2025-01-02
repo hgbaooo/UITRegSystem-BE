@@ -1,28 +1,14 @@
 const express = require('express');
-const multer = require('multer');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const formTypeValidation = require('../../validations/formType.validation');
 const formTypeController = require('../../controllers/formType.controller');
 
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 },
-});
-
 const router = express.Router();
-
-/**
- * @swagger
- * tags:
- *   name: FormTypes
- *   description: Form Type management API
- */
 
 router.post(
   '/create-form-type',
   auth('manageFormTypes'),
-  upload.single('file'),
   validate(formTypeValidation.createFormType),
   formTypeController.createFormType
 );
@@ -42,36 +28,60 @@ router.delete('/delete-form-type/:formTypeId', auth('manageFormTypes'), formType
 
 /**
  * @swagger
+ * tags:
+ *   name: FormTypes
+ *   description: API for managing form types
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     FormType:
+ *       type: object
+ *       required:
+ *         - name
+ *         - description
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: The name of the form type
+ *         description:
+ *           type: string
+ *           description: A brief description of the form type
+ *       example:
+ *         name: "Survey Form"
+ *         description: "A form type used for surveys."
+ */
+
+/**
+ * @swagger
  * /form-types/create-form-type:
  *   post:
- *     summary: Create a new form type with file upload (URL is generated automatically)
- *     description: Create a new form type with name and file upload. The URL will be generated automatically based on the uploaded file.
+ *     summary: Create a new form type
+ *     description: Allows the creation of a form type by providing a name and description.
  *     tags: [FormTypes]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - name
- *               - file
  *             properties:
  *               name:
  *                 type: string
- *                 description: The name of the form type.
- *               file:
+ *                 description: The name of the form type
+ *               description:
  *                 type: string
- *                 format: binary
- *                 description: File to be uploaded (e.g., image, PDF, DOCX).
- *             example:
- *               name: "Survey Form"
- *               file: file1.pdf
+ *                 description: A brief description of the form type
+ *             required:
+ *               - name
+ *               - description
  *     responses:
  *       "201":
- *         description: Form type created successfully with generated URLs.
+ *         description: Form type created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -83,69 +93,26 @@ router.delete('/delete-form-type/:formTypeId', auth('manageFormTypes'), formType
  *                 data:
  *                   $ref: '#/components/schemas/FormType'
  *       "400":
- *         description: Bad Request - Validation Error
+ *         $ref: '#/components/responses/BadRequest'
  *       "401":
- *         description: Unauthorized - User does not have permission
- *       "415":
- *         description: Unsupported Media Type - Invalid file format
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
  *       "500":
- *         description: Internal Server Error - Failed to create form type
- */
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     FormType:
- *       type: object
- *       required:
- *         - name
- *         - file
- *       properties:
- *         name:
- *           type: string
- *           description: The name of the form type
- *         file:
- *           type: string
- *           format: binary
- *           description: File to be uploaded (e.g., image, PDF, DOCX).
- *       example:
- *         name: "Survey Form"
- *         file: "https://firebase.com/file1"
- */
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     FormType:
- *       type: object
- *       required:
- *         - name
- *         - url
- *       properties:
- *         name:
- *           type: string
- *           description: The name of the form type
- *         url:
- *           type: string
- *           description: The URL associated with the form type
- *       example:
- *         name: "Survey Form"
- *         url: "https://example.com/survey-form"
+ *         description: Internal server error.
  */
 
 /**
  * @swagger
  * /form-types/get-all-form-types:
  *   get:
- *     summary: Get all form types
+ *     summary: Retrieve all form types
  *     tags: [FormTypes]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       "200":
- *         description: OK - List of all form types
+ *         description: A list of form types
  *         content:
  *           application/json:
  *             schema:
@@ -153,14 +120,14 @@ router.delete('/delete-form-type/:formTypeId', auth('manageFormTypes'), formType
  *               items:
  *                 $ref: '#/components/schemas/FormType'
  *       "401":
- *         description: Unauthorized - User does not have permission
+ *         $ref: '#/components/responses/Unauthorized'
  */
 
 /**
  * @swagger
  * /form-types/get-form-type/{formTypeId}:
  *   get:
- *     summary: Get form type by ID
+ *     summary: Retrieve a specific form type by ID
  *     tags: [FormTypes]
  *     security:
  *       - bearerAuth: []
@@ -170,16 +137,18 @@ router.delete('/delete-form-type/:formTypeId', auth('manageFormTypes'), formType
  *         required: true
  *         schema:
  *           type: string
- *         description: Form type ID
+ *         description: ID of the form type
  *     responses:
  *       "200":
- *         description: OK - The form type
+ *         description: The form type details
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/FormType'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
  *       "404":
- *         description: Not Found - Form type not found
+ *         $ref: '#/components/responses/NotFound'
  */
 
 /**
@@ -196,6 +165,7 @@ router.delete('/delete-form-type/:formTypeId', auth('manageFormTypes'), formType
  *         required: true
  *         schema:
  *           type: string
+ *         description: ID of the form type
  *     requestBody:
  *       required: true
  *       content:
@@ -205,16 +175,20 @@ router.delete('/delete-form-type/:formTypeId', auth('manageFormTypes'), formType
  *             properties:
  *               name:
  *                 type: string
- *               url:
+ *                 description: The updated name of the form type
+ *               description:
  *                 type: string
- *             example:
- *               name: Updated Form Type Name
- *               url: http://updated-url.com
+ *                 description: The updated description of the form type
+ *             required:
+ *               - name
+ *               - description
  *     responses:
  *       "200":
- *         description: Form type updated successfully.
+ *         description: Form type updated successfully
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
  *       "404":
- *         description: Not Found - Form type not found
+ *         $ref: '#/components/responses/NotFound'
  */
 
 /**
@@ -231,21 +205,16 @@ router.delete('/delete-form-type/:formTypeId', auth('manageFormTypes'), formType
  *         required: true
  *         schema:
  *           type: string
- *         description: Form type ID
+ *         description: ID of the form type
  *     responses:
  *       "200":
- *         description: Form type deleted successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *               example:
- *                 message: "Form type deleted successfully"
+ *         description: Form type deleted successfully
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
  *       "404":
- *         description: Not Found - Form type not found
+ *         $ref: '#/components/responses/NotFound'
  */
 
 module.exports = router;

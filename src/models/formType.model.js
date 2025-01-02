@@ -6,9 +6,13 @@ const formTypeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    url: {
+    description: {
       type: String,
       required: true,
+    },
+    createAt: {
+      type: Date,
+      default: Date.now,
     },
   },
   { collection: 'formTypes' }
