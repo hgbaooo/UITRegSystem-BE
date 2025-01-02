@@ -1,6 +1,5 @@
 const express = require('express');
 const multer = require('multer');
-const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const formValidation = require('../../validations/form.validation');
 const formController = require('../../controllers/form.controller');
@@ -19,31 +18,22 @@ const router = express.Router();
  *   description: Form management API
  */
 
-router.post(
-  '/create-form',
-  auth('manageForms'),
-  upload.single('file'),
-  validate(formValidation.createForm),
-  formController.createForm
-);
+router.post('/create-form', upload.single('file'), validate(formValidation.createForm), formController.createForm);
 
-router.get('/get-all-forms', auth('getForms'), formController.getAllForms);
+router.get('/get-form/:formId', formController.getForm);
 
-router.get('/get-form/:formId', auth('getForms'), formController.getForm);
+router.get('/get-all-forms', formController.getAllForms);
 
-router.patch('/update-form/:formId', auth('manageForms'), validate(formValidation.updateForm), formController.updateForm);
+router.patch('/update-form/:formId', validate(formValidation.updateForm), formController.updateForm);
 
-router.delete('/delete-form/:formId', auth('manageForms'), formController.deleteForm);
+router.delete('/delete-form/:formId', formController.deleteForm);
 
 /**
  * @swagger
  * /forms/create-form:
  *   post:
- *     summary: Create a form with an optional file
- *     description: Only authorized users can create forms with an optional file upload (image, PDF, Docx).
+ *     summary: Create a new form
  *     tags: [Forms]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -52,88 +42,74 @@ router.delete('/delete-form/:formId', auth('manageForms'), formController.delete
  *             type: object
  *             required:
  *               - name
- *               - formTypeId  # formTypeId is now required
+ *               - formTypeId
  *             properties:
  *               name:
  *                 type: string
- *                 description: The name of the form.
+ *                 description: Form name
+ *               description:
+ *                 type: string
+ *                 description: Form description
  *               formTypeId:
  *                 type: string
- *                 description: The ID of the form type.
+ *                 description: Reference to form type ID
  *               file:
  *                 type: string
  *                 format: binary
- *                 description: A single file to be uploaded (image, PDF, or Docx).
+ *                 description: Optional file (e.g., image, PDF)
  *             example:
- *               name: Sample Form
- *               formTypeId: 605c72ef1532071f1c1d8f3c
+ *               name: "Feedback Form"
+ *               formTypeId: "605c72ef1532071f1c1d8f3c"
  *               file: null
  *     responses:
- *       "201":
- *         description: Form created successfully, including the file.
+ *       201:
+ *         description: Form created successfully.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Form created successfully"
- *                 file:
- *                   type: string
- *                   example: "file1.jpg"
- *       "400":
- *         description: Bad Request - Validation or file upload error.
- *       "401":
- *         description: Unauthorized - User does not have permission.
- *       "415":
- *         description: Unsupported Media Type - Invalid file type or format.
+ *               $ref: '#/components/schemas/Form'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
  */
 
 /**
  * @swagger
  * /forms/get-all-forms:
  *   get:
- *     summary: Get all forms
+ *     summary: Retrieve all forms
  *     tags: [Forms]
- *     security:
- *       - bearerAuth: []
  *     responses:
- *       "200":
- *         description: OK
+ *       200:
+ *         description: List of forms
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Form'
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
  */
 
 /**
  * @swagger
  * /forms/get-form/{formId}:
  *   get:
- *     summary: Get a form by ID
+ *     summary: Retrieve a form by ID
  *     tags: [Forms]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: formId
  *         required: true
  *         schema:
  *           type: string
- *         description: Form ID
+ *         description: ID of the form
  *     responses:
- *       "200":
- *         description: OK
+ *       200:
+ *         description: Form details
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Form'
- *       "404":
+ *       404:
  *         $ref: '#/components/responses/NotFound'
  */
 
@@ -141,16 +117,15 @@ router.delete('/delete-form/:formId', auth('manageForms'), formController.delete
  * @swagger
  * /forms/update-form/{formId}:
  *   patch:
- *     summary: Update a form
+ *     summary: Update form details
  *     tags: [Forms]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: formId
  *         required: true
  *         schema:
  *           type: string
+ *         description: ID of the form
  *     requestBody:
  *       required: true
  *       content:
@@ -158,17 +133,17 @@ router.delete('/delete-form/:formId', auth('manageForms'), formController.delete
  *           schema:
  *             type: object
  *             properties:
- *               title:
+ *               name:
  *                 type: string
  *               description:
  *                 type: string
  *             example:
- *               title: Updated Form Title
- *               description: Updated form description.
+ *               name: "Updated Feedback Form"
+ *               description: "Updated description."
  *     responses:
- *       "200":
+ *       200:
  *         description: Form updated successfully.
- *       "404":
+ *       404:
  *         $ref: '#/components/responses/NotFound'
  */
 
@@ -177,30 +152,18 @@ router.delete('/delete-form/:formId', auth('manageForms'), formController.delete
  * /forms/delete-form/{formId}:
  *   delete:
  *     summary: Delete a form
- *     description: Only authorized users can delete forms.
  *     tags: [Forms]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: formId
  *         required: true
  *         schema:
  *           type: string
- *         description: Form ID
+ *         description: ID of the form
  *     responses:
- *       "200":
+ *       200:
  *         description: Form deleted successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *               example:
- *                 message: "Form deleted successfully"
- *       "404":
+ *       404:
  *         $ref: '#/components/responses/NotFound'
  */
 

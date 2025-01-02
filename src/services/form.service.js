@@ -4,14 +4,19 @@ const { Form, FormType } = require('../models');
 const ApiError = require('../utils/ApiError');
 const firebaseService = require('./firebase.service');
 
-const createForm = async (formBody, file, userId) => {
+const createForm = async (formBody, file) => {
   try {
     const { formTypeId } = formBody;
 
+    if (!ObjectId.isValid(formTypeId)) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid form type ID');
+    }
+
     const formType = await FormType.findById(formTypeId);
     if (!formType) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid formType ID provided');
+      throw new ApiError(httpStatus.BAD_REQUEST, 'FormType ID provided not found');
     }
+
     let fileUrl = null;
 
     if (file) {
@@ -20,9 +25,9 @@ const createForm = async (formBody, file, userId) => {
 
     const newForm = new Form({
       name: formBody.name,
+      description: formBody.description,
       formTypeId: formBody.formTypeId,
       url: fileUrl,
-      userId,
       createdAt: Date.now(),
     });
 
@@ -38,12 +43,16 @@ const createForm = async (formBody, file, userId) => {
 
 const getAllForms = async () => {
   try {
-    return await Form.find();
+    const forms = await Form.find().populate('formTypeId', 'name');
+    return forms.map((form) => ({
+      ...form.toObject(),
+      formTypeName: form.formTypeId.name,
+    }));
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
     }
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error fetching forms');
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error fetching forms with form type names');
   }
 };
 
@@ -52,11 +61,14 @@ const getFormById = async (formId) => {
     if (!ObjectId.isValid(formId)) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid document ID');
     }
-    const form = await Form.findById(formId);
+    const form = await Form.findById(formId).populate('formTypeId', 'name');
     if (!form) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Form not found');
     }
-    return form;
+    return {
+      ...form.toObject(),
+      formTypeName: form.formTypeId.name,
+    };
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;

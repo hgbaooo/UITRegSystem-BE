@@ -57,6 +57,37 @@ components:
         description: This is a sample description for a form type
         createAt: 2025-01-01T10:00:00.000Z'
 
+    Form:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the form
+        name:
+          type: string
+          description: The name of the form
+        description:
+          type: string
+          description: A brief description of the form
+        url:
+          type: string
+          format: uri
+          description: URL for the form
+        formTypeId:
+          type: string
+          description: Reference ID to the FormType
+        createAt:
+          type: string
+          format: date-time
+          description: Timestamp when the form was created
+      example:
+        id: 601c3f3b954f1a39b003f10d
+        name: 'Contact Us Form'
+        description: 'Form to capture contact information'
+        url: 'https://example.com/forms/contact-us'
+        formTypeId: '5f47ac10b54764421b7163e1'
+        createAt: 2025-01-01T12:00:00.000Z
+
     Error:
       type: object
       properties:
