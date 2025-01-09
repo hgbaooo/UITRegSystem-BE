@@ -14,6 +14,10 @@ const formSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    docxUrl: {
+      type: String,
+      required: true,
+    },
     formTypeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'FormType',

@@ -4,7 +4,7 @@ const { Form, FormType } = require('../models');
 const ApiError = require('../utils/ApiError');
 const firebaseService = require('./firebase.service');
 
-const createForm = async (formBody, file) => {
+const createForm = async (formBody, file, docxFile) => {
   try {
     const { formTypeId } = formBody;
 
@@ -18,9 +18,14 @@ const createForm = async (formBody, file) => {
     }
 
     let fileUrl = null;
+    let docxUrl = null;
 
     if (file) {
       fileUrl = await firebaseService.uploadFileToFirebase(file, 'forms', formBody.name);
+    }
+
+    if (docxFile) {
+      docxUrl = await firebaseService.uploadFileToFirebase(docxFile, 'forms', `docxFile${formBody.name}`);
     }
 
     const newForm = new Form({
@@ -28,6 +33,7 @@ const createForm = async (formBody, file) => {
       description: formBody.description,
       formTypeId: formBody.formTypeId,
       url: fileUrl,
+      docxUrl,
       createdAt: Date.now(),
     });
 

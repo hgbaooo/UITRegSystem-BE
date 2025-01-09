@@ -1,5 +1,6 @@
 const express = require('express');
 const multer = require('multer');
+const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const formValidation = require('../../validations/form.validation');
 const formController = require('../../controllers/form.controller');
@@ -8,6 +9,11 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
 });
+
+const uploadFields = upload.fields([
+  { name: 'file', maxCount: 1 },
+  { name: 'docxFile', maxCount: 1 },
+]);
 
 const router = express.Router();
 
@@ -18,15 +24,21 @@ const router = express.Router();
  *   description: Form management API
  */
 
-router.post('/create-form', upload.single('file'), validate(formValidation.createForm), formController.createForm);
+router.post(
+  '/create-form',
+  auth('manageForms'),
+  uploadFields,
+  validate(formValidation.createForm),
+  formController.createForm
+);
 
 router.get('/get-form/:formId', formController.getForm);
 
 router.get('/get-all-forms', formController.getAllForms);
 
-router.patch('/update-form/:formId', validate(formValidation.updateForm), formController.updateForm);
+router.patch('/update-form/:formId', auth('manageForms'), validate(formValidation.updateForm), formController.updateForm);
 
-router.delete('/delete-form/:formId', formController.deleteForm);
+router.delete('/delete-form/:formId', auth('manageForms'), formController.deleteForm);
 
 /**
  * @swagger
@@ -43,6 +55,8 @@ router.delete('/delete-form/:formId', formController.deleteForm);
  *             required:
  *               - name
  *               - formTypeId
+ *               - file
+ *               - docxFile
  *             properties:
  *               name:
  *                 type: string
@@ -56,11 +70,16 @@ router.delete('/delete-form/:formId', formController.deleteForm);
  *               file:
  *                 type: string
  *                 format: binary
- *                 description: Optional file (e.g., image, PDF)
+ *                 description: Primary file (e.g., image, PDF)
+ *               docxFile:
+ *                 type: string
+ *                 format: binary
+ *                 description: Additional file (e.g., Word document)
  *             example:
  *               name: "Feedback Form"
  *               formTypeId: "605c72ef1532071f1c1d8f3c"
  *               file: null
+ *               docxFile: null
  *     responses:
  *       201:
  *         description: Form created successfully.
