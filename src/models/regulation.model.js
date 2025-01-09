@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const userPromptSchema = new mongoose.Schema(
+const regulationSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -9,6 +9,7 @@ const userPromptSchema = new mongoose.Schema(
     issuedDate: {
       type: Date,
       default: Date.now,
+      required: true,
     },
     updatedDate: {
       type: Date,
@@ -20,10 +21,9 @@ const userPromptSchema = new mongoose.Schema(
     },
     updatedSource: {
       type: String,
-      required: true,
     },
   },
-  { collection: 'userPrompts' }
+  { collection: 'regulations' }
 );
 
-module.exports = mongoose.model('UserPrompt', userPromptSchema);
+module.exports = mongoose.model('Regulation', regulationSchema);

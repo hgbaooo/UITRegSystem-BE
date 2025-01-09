@@ -88,6 +88,34 @@ components:
         formTypeId: '5f47ac10b54764421b7163e1'
         createAt: 2025-01-01T12:00:00.000Z
 
+    Regulation:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the regulation
+        issuedDate:
+          type: string
+          format: date-time
+          description: Date when the regulation was issued
+        updatedDate:
+          type: string
+          format: date-time
+          description: Date when the regulation was last updated
+        sourceUrl:
+          type: string
+          format: uri
+          description: URL of the regulation source
+        updatedSource:
+          type: string
+          description: Source of the updated regulation
+      example:
+        name: 'Regulation Example'
+        issuedDate: '2023-10-01T10:00:00.000Z'
+        updatedDate: '2023-10-10T10:00:00.000Z'
+        sourceUrl: 'https://example.com/regulations/regulation-example'
+        updatedSource: 'Updated Regulation Source'
+
     Error:
       type: object
       properties:

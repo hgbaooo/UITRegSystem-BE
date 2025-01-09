@@ -1,13 +1,30 @@
-// src/controllers/regulationController.js
-const { getAnswerFromPython } = require('../services/regulation.service');
+const httpStatus = require('http-status');
+const catchAsync = require('../utils/catchAsync');
+const { regulationService } = require('../services');
 
-const predictAnswer = async (req, res) => {
-  try {
-    const { answer, base } = await getAnswerFromPython(req.body.question);
-    res.json({ answer, base });
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
+const createRegulation = catchAsync(async (req, res) => {
+  const regulation = await regulationService.createRegulation(req.body, req.files.sourceFile, req.files.updatedFile);
+  res.status(httpStatus.CREATED).send(regulation);
+});
+
+const getRegulation = catchAsync(async (req, res) => {
+  const regulation = await regulationService.getRegulationById(req.params.regulationId);
+  res.status(httpStatus.OK).send(regulation);
+});
+
+const getAllRegulations = catchAsync(async (req, res) => {
+  const regulations = await regulationService.getAllRegulations();
+  res.status(httpStatus.OK).send(regulations);
+});
+
+const deleteRegulation = catchAsync(async (req, res) => {
+  await regulationService.deleteRegulationById(req.params.regulationId);
+  res.status(httpStatus.OK).json({ message: 'Regulation deleted successfully' });
+});
+
+module.exports = {
+  createRegulation,
+  getRegulation,
+  getAllRegulations,
+  deleteRegulation,
 };
-
-module.exports = { predictAnswer };

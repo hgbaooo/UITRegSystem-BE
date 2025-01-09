@@ -19,4 +19,6 @@ const userPromptSchema = new mongoose.Schema(
   { collection: 'userPrompts' }
 );
 
-module.exports = mongoose.model('UserPrompt', userPromptSchema);
+const UserPrompt = mongoose.model('UserPrompt', userPromptSchema);
+
+module.exports = UserPrompt;

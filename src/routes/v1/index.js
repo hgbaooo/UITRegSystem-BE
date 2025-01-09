@@ -20,7 +20,7 @@ const defaultRoutes = [
     route: userRoute,
   },
   {
-    path: '/regulation',
+    path: '/regulations',
     route: regulationRoute,
   },
   {
