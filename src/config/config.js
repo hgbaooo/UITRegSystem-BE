@@ -31,11 +31,11 @@ const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' }
 if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }
-
+const port = process.env.PORT || envVars.PORT || 3100;
 module.exports = {
   env: envVars.NODE_ENV,
-  port: envVars.PORT || 3100,
-  host: process.env.RAILWAY_STATIC_URL || `http://localhost:${envVars.PORT || 3100}`,
+  port,
+  host: process.env.RAILWAY_STATIC_URL || `http://localhost:${port}`,
   mongoose: {
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
     options: {
