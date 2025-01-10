@@ -61,7 +61,6 @@
     "express": "^4.21.1",
     "express-mongo-sanitize": "^2.0.0",
     "express-rate-limit": "^5.0.0",
-    "faiss-node": "^0.5.1",
     "firebase": "^11.0.2",
     "firebase-admin": "^13.0.1",
     "helmet": "^4.1.0",
