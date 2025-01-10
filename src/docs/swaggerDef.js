@@ -13,7 +13,7 @@ const swaggerDef = {
   },
   servers: [
     {
-      url: `${config.host}/v1`,
+      url: `${config.host}/v1`.replace(/\/$/, ''),
     },
   ],
 };
