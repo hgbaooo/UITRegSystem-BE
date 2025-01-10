@@ -12,7 +12,7 @@ const swaggerDef = {
   },
   servers: [
     {
-      url: '/',
+      url: '',
     },
   ],
 };
