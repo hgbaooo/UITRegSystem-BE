@@ -1,0 +1,6 @@
+langchain
+transformers
+faiss-cpu
+pandas
+python-dotenv
+langchain-huggingface
