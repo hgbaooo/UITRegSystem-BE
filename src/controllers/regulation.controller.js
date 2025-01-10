@@ -1,6 +1,18 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const { regulationService } = require('../services');
+const { regulationService, qaService } = require('../services');
+
+const askQuestion = catchAsync(async (req, res) => {
+  const { question } = req.body;
+  if (!question) {
+    return res.status(httpStatus.BAD_REQUEST).json({ error: 'Question is required' });
+  }
+  const result = await qaService.askQuestion(question);
+  if (result && result.error) {
+    return res.status(500).json({ error: result.error });
+  }
+  res.status(httpStatus.OK).json(result);
+});
 
 const createRegulation = catchAsync(async (req, res) => {
   const regulation = await regulationService.createRegulation(req.body, req.files.sourceFile, req.files.updatedFile);
@@ -23,6 +35,7 @@ const deleteRegulation = catchAsync(async (req, res) => {
 });
 
 module.exports = {
+  askQuestion,
   createRegulation,
   getRegulation,
   getAllRegulations,

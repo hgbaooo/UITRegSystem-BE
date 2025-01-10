@@ -22,10 +22,67 @@ const router = express.Router();
  *   description: Regulations management API
  */
 
+router.post('/ask', regulationController.askQuestion);
 router.post('/create-regulation', auth('manageRegulations'), uploadFields, regulationController.createRegulation);
 router.get('/get-regulation/:regulationId', regulationController.getRegulation);
 router.get('/get-all-regulations', regulationController.getAllRegulations);
 router.delete('/delete-regulation/:regulationId', auth('manageRegulations'), regulationController.deleteRegulation);
+
+/**
+ * @swagger
+ * /regulations/ask:
+ *   post:
+ *     summary: Get answer based on trained data
+ *     tags: [Regulations]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - question
+ *             properties:
+ *               question:
+ *                 type: string
+ *                 description: User's question to the model
+ *             example:
+ *               question: "Mục tiêu của chương trình giáo dục của trường?"
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the answer
+ *         content:
+ *           application/json:
+ *             schema:
+ *              type: object
+ *              properties:
+ *                 results:
+ *                    type: array
+ *                    items:
+ *                      type: object
+ *                      properties:
+ *                         answer:
+ *                           type: string
+ *                           description: The answer to the prompt
+ *                         source:
+ *                           type: string
+ *                           description: The source of the answer
+ *                         issueDate:
+ *                           type: string
+ *                           description: The issued date of the source
+ *                         updateDate:
+ *                           type: string
+ *                           description: The updated date of the source
+ *                         sourcePath:
+ *                           type: string
+ *                           description: The source path of the source
+ *                         updateFilesPath:
+ *                           type: string
+ *                           description: The path of the updated file source
+ *
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ */
 
 /**
  * @swagger

@@ -8,3 +8,4 @@ module.exports.formService = require('./form.service');
 module.exports.formTypeService = require('./formType.service');
 module.exports.firebaseService = require('./firebase.service');
 module.exports.regulationService = require('./regulation.service');
+module.exports.qaService = require('./qa_service');
