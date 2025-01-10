@@ -1,3 +1,4 @@
+// routes/v1/index.js
 const express = require('express');
 const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
@@ -7,6 +8,7 @@ const notificationRoute = require('./notification.route');
 const formRoute = require('./form.route');
 const formTypeRoute = require('./formType.route');
 const config = require('../../config/config');
+const logger = require('../../config/logger'); // import logger
 
 const router = express.Router();
 
@@ -49,11 +51,19 @@ defaultRoutes.forEach((route) => {
   router.use(route.path, route.route);
 });
 
-/* istanbul ignore next */
-if (config.env === 'development') {
+const showDocs = process.env.SHOW_DOCS === 'true';
+if (config.env === 'development' || showDocs) {
+  logger.info(`Enabling /docs route. SHOW_DOCS=${showDocs}`);
   devRoutes.forEach((route) => {
     router.use(route.path, route.route);
   });
 }
+
+// Log all routes
+router.stack.forEach(function (r) {
+  if (r.route && r.route.path) {
+    logger.info(`Route: ${r.route.path}`);
+  }
+});
 
 module.exports = router;
