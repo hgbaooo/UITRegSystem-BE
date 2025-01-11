@@ -14,9 +14,10 @@ FROM python:3.10-slim-bookworm AS finetune
 
 WORKDIR /finetune_model
 
+COPY --from=builder /usr/src/node-app/src/finetune_model/requirements.txt . 
+
 COPY --from=builder /usr/src/node-app/src/utils ./utils
 COPY --from=builder /usr/src/node-app/src/finetune_model .
-COPY requirements.txt .
 
 RUN pip install -r requirements.txt && python finetune.py
 
