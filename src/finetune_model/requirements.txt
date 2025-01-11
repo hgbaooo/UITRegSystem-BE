@@ -4,3 +4,4 @@ faiss-cpu
 pandas
 python-dotenv
 langchain-huggingface
+langchain-community
