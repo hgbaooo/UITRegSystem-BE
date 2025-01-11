@@ -2,8 +2,11 @@ import sys
 import json
 import os
 import re
+import io
+import logging
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from utils.loadDataFromCSV import load_data_from_csv
@@ -12,6 +15,9 @@ from langchain_community.llms import HuggingFaceHub
 from dotenv import load_dotenv
 load_dotenv()
 
+# Cấu hình logging vào file
+log_file = os.path.join(os.path.dirname(__file__), 'qa_service.log')
+logging.basicConfig(filename=log_file, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s',encoding='utf-8')
 
 def process_question(question):
     try:
@@ -22,7 +28,7 @@ def process_question(question):
         vector_store = FAISS.load_local(model_path, embeddings, allow_dangerous_deserialization=True)
         
         model = HuggingFaceHub(
-            repo_id="google/flan-t5-base", 
+            repo_id="google/flan-t5-base",
             huggingfacehub_api_token = os.getenv("HUGGINGFACEHUB_API_KEY")
           )
         
@@ -34,6 +40,7 @@ def process_question(question):
         result = qa_chain({"query": question})
         formatted_results = []
         for doc in result['source_documents']:
+            logging.debug(f"Raw document content: {doc.page_content}")
             lines = doc.page_content.split("\n")
             answer = ""
             source = ""
@@ -42,28 +49,49 @@ def process_question(question):
             source_path = ""
             update_files_path = ""
             current_key = None
-            for line in lines:
-                 if line.strip() == "" :
+            i = 0
+            while i < len(lines):
+                line = lines[i].strip()
+                if not line:
+                    i+=1
                     continue
-                 match = re.match(r"^(Câu trả lời:|Căn cứ:|Ngày ban hành:|Ngày cập nhật:|Đường dẫn căn cứ:|Đường dẫn các file cập nhật:)\s*(.*)", line)
-                 if match:
+                match = re.match(r"^(Câu trả lời:|Căn cứ:|Ngày ban hành:|Ngày cập nhật:|Đường dẫn căn cứ:|Đường dẫn các file cập nhật:)\s*(.*)", line)
+                if match:
                     current_key = match.group(1).strip()
                     value = match.group(2).strip()
                     if current_key == "Câu trả lời:":
-                       answer = value
+                        answer = value
+                        i += 1
+                        while i < len(lines):
+                          next_line = lines[i].strip()
+                          if not next_line:
+                             i += 1
+                             continue
+                          if re.match(r"^(Câu trả lời:|Căn cứ:|Ngày ban hành:|Ngày cập nhật:|Đường dẫn căn cứ:|Đường dẫn các file cập nhật:)",next_line):
+                            break
+                          else:
+                            answer += "\n" + next_line
+                            i += 1
+                        
                     elif current_key == "Căn cứ:":
                         source = value
+                        i+=1
                     elif current_key == "Ngày ban hành:":
                         issue_date = value
+                        i+=1
                     elif current_key == "Ngày cập nhật:":
                        update_date = value
+                       i+=1
                     elif current_key == "Đường dẫn căn cứ:":
                        source_path = value
+                       i+=1
                     elif current_key == "Đường dẫn các file cập nhật:":
                         update_files_path = value
-                 elif current_key == "Câu trả lời:" and line.strip():
-                     answer += "\n" + line.strip()
-            
+                        i+=1
+                else:
+                  i +=1
+
+
             formatted_results.append({
                 "answer": answer.strip(),
                 "source": source,
@@ -72,6 +100,7 @@ def process_question(question):
                 "sourcePath": source_path,
                 "updateFilesPath": update_files_path
             })
+        logging.debug(f"Formatted results: {formatted_results}")
         return  {"results": formatted_results}
     except Exception as e:
         return {"error": str(e)}
@@ -79,6 +108,7 @@ def process_question(question):
 if __name__ == '__main__':
     input_json = json.loads(sys.argv[1])
     question = input_json['question']
-    
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     result = process_question(question)
-    print(json.dumps(result))
+    print(json.dumps(result, ensure_ascii=False))
