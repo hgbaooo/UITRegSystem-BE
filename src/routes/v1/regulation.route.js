@@ -22,7 +22,7 @@ const router = express.Router();
  *   description: Regulations management API
  */
 
-router.post('/ask', regulationController.askQuestion);
+router.post('/ask', auth('askRegulation'), regulationController.askQuestion);
 router.post('/create-regulation', auth('manageRegulations'), uploadFields, regulationController.createRegulation);
 router.get('/get-regulation/:regulationId', regulationController.getRegulation);
 router.get('/get-all-regulations', regulationController.getAllRegulations);
@@ -34,6 +34,8 @@ router.delete('/delete-regulation/:regulationId', auth('manageRegulations'), reg
  *   post:
  *     summary: Get answer based on trained data
  *     tags: [Regulations]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
