@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:20-bullseye AS builder
 
 WORKDIR /usr/src/node-app
 
@@ -10,7 +10,7 @@ COPY --chown=node:node . .
 
 RUN yarn run build
 
-FROM python:3.10-slim-bookworm AS finetune
+FROM python:3.10-bullseye AS finetune
 
 WORKDIR /finetune_model
 
@@ -19,24 +19,17 @@ COPY --from=builder /usr/src/node-app/src/finetune_model/requirements.txt .
 COPY --from=builder /usr/src/node-app/src/utils ./utils
 COPY --from=builder /usr/src/node-app/src/finetune_model .
 
-RUN pip install --break-system-packages -r requirements.txt && python finetune.py
+RUN apt-get update && apt-get install -y gcc g++ libffi-dev && \
+    pip install -r requirements.txt && python finetune.py
 
-FROM node:20-alpine
+FROM node:20-bullseye
 
 WORKDIR /usr/src/node-app
 
-RUN apk add --no-cache build-base g++ gcc py3-pip python3
-# Install pip
-#RUN apk add --no-cache py3-pip
-# Install required python packages in node image
-COPY --from=builder /usr/src/node-app/src/finetune_model/requirements.txt ./src/finetune_model/requirements.txt
-RUN pip3 install --break-system-packages torch==2.2.0+cpu torchvision==0.17.0+cpu torchaudio==2.2.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html && \
-    sed -i '/torch/d' ./src/finetune_model/requirements.txt && \
-    pip3 install --break-system-packages -r src/finetune_model/requirements.txt  && pip install scikit-learn==1.2.0
-   
-
+RUN apt-get update && apt-get install -y python3 python3-pip
 
 COPY --from=builder /usr/src/node-app .
+
 COPY --from=finetune /finetune_model/model_output ./src/finetune_model/model_output
 COPY --from=finetune /finetune_model/data_regulation.csv ./src/finetune_model/data_regulation.csv
 
