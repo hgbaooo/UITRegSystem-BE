@@ -22,7 +22,6 @@ COPY --chown=node:node . .
 # Build the Node.js application
 RUN yarn run build
 
-
 # Stage 2: Python environment for fine-tuning
 FROM python:3.10-bullseye AS finetune
 
@@ -34,13 +33,15 @@ COPY --from=builder /usr/src/node-app/src/finetune_model/requirements.txt .
 COPY --from=builder /usr/src/node-app/src/utils ./utils
 COPY --from=builder /usr/src/node-app/src/finetune_model .
 
+# Upgrade pip to the latest version
+RUN pip install --upgrade pip
+
 # Install dependencies for fine-tuning
 RUN apt-get update && apt-get install -y g++ gcc libffi-dev && \
     pip install --break-system-packages -r requirements.txt
 
 # Run the fine-tuning script
 RUN python finetune.py
-
 
 # Stage 3: Final Node.js application
 FROM node:20-bullseye
@@ -51,6 +52,9 @@ WORKDIR /usr/src/node-app
 # Install Python and related tools
 RUN apt-get update && apt-get install -y python3 python3-pip && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip to the latest version
+RUN pip3 install --upgrade pip
 
 # Copy updated Python dependencies and the fine-tuned model
 COPY --from=builder /usr/src/node-app/src/finetune_model/requirements.txt ./src/finetune_model/requirements.txt
