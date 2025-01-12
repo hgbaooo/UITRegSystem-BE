@@ -4,9 +4,17 @@ FROM node:20-bullseye AS builder
 # Set the working directory in the container
 WORKDIR /usr/src/node-app
 
+# Install system dependencies required by sharp
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    libvips-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Copy package files and install dependencies
 COPY package*.json yarn.lock ./
-RUN yarn install --pure-lockfile
+RUN yarn install --network-timeout 100000 --pure-lockfile
 
 # Copy the rest of the application files
 COPY --chown=node:node . .
