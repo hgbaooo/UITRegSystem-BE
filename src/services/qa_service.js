@@ -4,13 +4,9 @@ require('dotenv').config();
 
 async function askQuestion(question) {
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn(
-      'env',
-      ['python3', path.join(__dirname, './qa_service_helper.py'), JSON.stringify({ question })],
-      {
-        cwd: path.join(__dirname, '..'),
-      }
-    );
+    const pythonProcess = spawn('python', [path.join(__dirname, './qa_service_helper.py'), JSON.stringify({ question })], {
+      cwd: path.join(__dirname, '..'),
+    });
 
     let resultData = '';
     let errorData = '';

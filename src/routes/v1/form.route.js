@@ -46,6 +46,8 @@ router.delete('/delete-form/:formId', auth('manageForms'), formController.delete
  *   post:
  *     summary: Create a new form
  *     tags: [Forms]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -138,6 +140,8 @@ router.delete('/delete-form/:formId', auth('manageForms'), formController.delete
  *   patch:
  *     summary: Update form details
  *     tags: [Forms]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: formId
@@ -172,6 +176,8 @@ router.delete('/delete-form/:formId', auth('manageForms'), formController.delete
  *   delete:
  *     summary: Delete a form
  *     tags: [Forms]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: formId
