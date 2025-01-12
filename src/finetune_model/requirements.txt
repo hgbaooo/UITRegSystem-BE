@@ -7,3 +7,5 @@ langchain-community>=0.0.19,<1.0
 langchain-huggingface
 sentence-transformers>=2.2.2,<3.0
 tokenizers>=0.19.1
+torch
+torchvision
