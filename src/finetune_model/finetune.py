@@ -30,7 +30,7 @@ def finetune_and_save_model(data_path, output_dir, embedding_model = "sentence-t
             docs.append(doc)
 
         # Split the documents
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=3000, chunk_overlap=600)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1800, chunk_overlap=600)
         splitted_docs = text_splitter.create_documents(docs)
 
         # Embedding model

@@ -22,7 +22,7 @@ COPY --chown=node:node . .
 RUN yarn run build
 
 # Stage 2: Python environment for fine-tuning
-FROM python:3.9-bullseye AS finetune
+FROM python:3.10-bullseye AS finetune
 
 # Set the working directory in the container
 WORKDIR /finetune_model

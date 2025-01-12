@@ -89,7 +89,7 @@ async function askQuestion(question) {
       pythonExecutable = 'python';
       const pythonScriptPath = path.resolve(__dirname, './qa_service_helper.py');
       const pythonProcess = spawn(pythonExecutable, [pythonScriptPath, JSON.stringify({ question })], {
-        cwd: path.join(__dirname, '..'), // Ensure the python process cwd is correct
+        cwd: path.join(__dirname, '..'),
         env: process.env,
       });
       let resultData = '';
