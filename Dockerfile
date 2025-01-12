@@ -25,6 +25,8 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/node-app
 
+RUN apk add --no-cache python3
+
 COPY --from=builder /usr/src/node-app .
 COPY --from=finetune /finetune_model/model_output ./src/finetune_model/model_output
 COPY --from=finetune /finetune_model/data_regulation.csv ./src/finetune_model/data_regulation.csv
