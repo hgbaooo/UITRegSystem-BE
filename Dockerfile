@@ -15,6 +15,7 @@ FROM python:3.10-slim-bookworm AS finetune
 WORKDIR /finetune_model
 
 COPY --from=builder /usr/src/node-app/src/finetune_model/requirements.txt . 
+
 COPY --from=builder /usr/src/node-app/src/utils ./utils
 COPY --from=builder /usr/src/node-app/src/finetune_model .
 
@@ -29,9 +30,7 @@ COPY --from=finetune /finetune_model/model_output ./src/finetune_model/model_out
 COPY --from=finetune /finetune_model/data_regulation.csv ./src/finetune_model/data_regulation.csv
 
 
-# This will install python via nixpacks
-COPY nixpacks.toml ./
-RUN  apk add --no-cache curl && curl -fsSL https://get.nixpacks.com/ | sh && yarn install --pure-lockfile
+RUN yarn install --pure-lockfile
 
 USER node
 
