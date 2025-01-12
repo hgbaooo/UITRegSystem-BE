@@ -6,14 +6,14 @@ WORKDIR /usr/src/node-app
 
 # Install system dependencies required by sharp
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    g++ \
-    libvips-dev \
+    python3 \
     make \
-    python3
- 
+    g++ \
+    libvips-dev 
+    
 # Copy package files and install dependencies
 COPY package*.json yarn.lock ./
-RUN yarn install --network-timeout 100000 --pure-lockfile
+RUN yarn install --network-timeout 600000 --pure-lockfile
 
 # Copy the rest of the application files
 COPY --chown=node:node . .
@@ -38,7 +38,7 @@ RUN pip install --upgrade pip
 
 # Install dependencies for fine-tuning
 RUN apt-get update && apt-get install -y --no-install-recommends g++ gcc libffi-dev libgl1-mesa-glx libopenblas-dev && \
- pip install --break-system-packages -r requirements.txt
+    pip install --break-system-packages -r requirements.txt
 
 # Run the fine-tuning script
 RUN python finetune.py
@@ -51,7 +51,7 @@ WORKDIR /usr/src/node-app
 
 # Install Python and related tools
 RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip && \
- apt-get clean && rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Upgrade pip to the latest version
 RUN pip3 install --upgrade pip
@@ -73,6 +73,9 @@ USER node
 
 # Expose the application port
 EXPOSE 3000
+
+# Find python3 path
+RUN which python3 > /tmp/python3_path
 
 # Start the application
 CMD ["yarn", "start"]
