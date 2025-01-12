@@ -22,7 +22,7 @@ COPY --chown=node:node . .
 RUN yarn run build
 
 # Stage 2: Python environment for fine-tuning
-FROM python:3.10-bullseye AS finetune
+FROM python:3.9-bullseye AS finetune
 
 # Set the working directory in the container
 WORKDIR /finetune_model
@@ -71,11 +71,11 @@ RUN yarn install --pure-lockfile
 # Set the container to use the "node" user
 USER node
 
-# Expose the application port
-EXPOSE 3000
-
 # Find python3 path
 RUN which python3 > /tmp/python3_path
+
+# Expose the application port
+EXPOSE 3000
 
 # Start the application
 CMD ["yarn", "start"]
