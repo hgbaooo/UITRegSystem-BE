@@ -1,10 +1,8 @@
 import os
 import sys
-import shutil
-import pandas as pd
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 # Thay đổi import ở đây
-from langchain_huggingface.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from utils.loadDataFromCSV import load_data_from_csv

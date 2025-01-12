@@ -3,21 +3,14 @@ import json
 import os
 import re
 import io
-import logging
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from langchain_huggingface.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from utils.loadDataFromCSV import load_data_from_csv
 from langchain.chains import RetrievalQA
 from langchain_community.llms import HuggingFaceHub
 from dotenv import load_dotenv
 load_dotenv()
-
-# Cấu hình logging vào file
-log_file = os.path.join(os.path.dirname(__file__), 'qa_service.log')
-logging.basicConfig(filename=log_file, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s',encoding='utf-8')
 
 def process_question(question):
     try:
@@ -40,7 +33,6 @@ def process_question(question):
         result = qa_chain({"query": question})
         formatted_results = []
         for doc in result['source_documents']:
-            logging.debug(f"Raw document content: {doc.page_content}")
             lines = doc.page_content.split("\n")
             answer = ""
             source = ""
@@ -100,7 +92,6 @@ def process_question(question):
                 "sourcePath": source_path,
                 "updateFilesPath": update_files_path
             })
-        logging.debug(f"Formatted results: {formatted_results}")
         return  {"results": formatted_results}
     except Exception as e:
         return {"error": str(e)}
