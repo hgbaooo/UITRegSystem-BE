@@ -5,4 +5,4 @@ pandas
 python-dotenv
 langchain-huggingface
 langchain-community
-sentence-transformers==2.2.2
+sentence-transformers
