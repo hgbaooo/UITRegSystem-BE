@@ -6,11 +6,11 @@ WORKDIR /usr/src/node-app
 
 # Install system dependencies required by sharp
 RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
-    g++ \
-    libvips-dev && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+ g++ \
+ libvips-dev \
+ make \
+ python3 && \
+ apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy package files and install dependencies
 COPY package*.json yarn.lock ./
@@ -32,13 +32,14 @@ WORKDIR /finetune_model
 COPY --from=builder /usr/src/node-app/src/finetune_model/requirements.txt .
 COPY --from=builder /usr/src/node-app/src/utils ./utils
 COPY --from=builder /usr/src/node-app/src/finetune_model .
+COPY --from=builder /usr/src/node-app/src/finetune_model/data_regulation.csv .
 
 # Upgrade pip to the latest version
 RUN pip install --upgrade pip
 
 # Install dependencies for fine-tuning
-RUN apt-get update && apt-get install -y g++ gcc libffi-dev && \
-    pip install --break-system-packages -r requirements.txt
+RUN apt-get update && apt-get install -y g++ gcc libffi-dev libgl1-mesa-glx && \
+ pip install --break-system-packages -r requirements.txt
 
 # Run the fine-tuning script
 RUN python finetune.py
@@ -51,7 +52,7 @@ WORKDIR /usr/src/node-app
 
 # Install Python and related tools
 RUN apt-get update && apt-get install -y python3 python3-pip && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+ apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Upgrade pip to the latest version
 RUN pip3 install --upgrade pip

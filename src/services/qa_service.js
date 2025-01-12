@@ -19,6 +19,7 @@ async function askQuestion(question) {
         const pythonScriptPath = path.resolve(__dirname, './qa_service_helper.py');
         const pythonProcess = spawn(pythonExecutable, [pythonScriptPath, JSON.stringify({ question })], {
           cwd: path.join(__dirname, '..'), // Ensure the python process cwd is correct
+          env: process.env,
         });
         let resultData = '';
         let errorData = '';
@@ -39,7 +40,9 @@ async function askQuestion(question) {
               reject(new Error(`Python script returned invalid JSON: ${e.message} - raw data: ${resultData} `));
             }
           } else {
-            reject(new Error(`Python script exited with code ${exitCode} - details: ${errorData}`));
+            reject(
+              new Error(`Python script exited with code ${exitCode} - details: ${errorData || 'No error message received'}`)
+            );
           }
         });
         pythonProcess.on('error', (innerErr) => {
@@ -50,6 +53,7 @@ async function askQuestion(question) {
         const pythonScriptPath = path.resolve(__dirname, './qa_service_helper.py');
         const pythonProcess = spawn(pythonExecutable, [pythonScriptPath, JSON.stringify({ question })], {
           cwd: path.join(__dirname, '..'), // Ensure the python process cwd is correct
+          env: process.env,
         });
         let resultData = '';
         let errorData = '';
@@ -70,7 +74,10 @@ async function askQuestion(question) {
               reject(new Error(`Python script returned invalid JSON: ${e.message} - raw data: ${resultData} `));
             }
           } else {
-            reject(new Error(`Python script exited with code ${code} - details: ${errorData}`));
+            const errorMessage = errorData
+              ? `Python script exited with code ${code} - details: ${errorData}`
+              : `Python script exited with code ${code} - details: No error message received`;
+            reject(new Error(errorMessage));
           }
         });
         pythonProcess.on('error', (err) => {
@@ -82,8 +89,8 @@ async function askQuestion(question) {
       const pythonScriptPath = path.resolve(__dirname, './qa_service_helper.py');
       const pythonProcess = spawn(pythonExecutable, [pythonScriptPath, JSON.stringify({ question })], {
         cwd: path.join(__dirname, '..'), // Ensure the python process cwd is correct
+        env: process.env,
       });
-
       let resultData = '';
       let errorData = '';
 
@@ -103,7 +110,10 @@ async function askQuestion(question) {
             reject(new Error(`Python script returned invalid JSON: ${e.message} - raw data: ${resultData} `));
           }
         } else {
-          reject(new Error(`Python script exited with code ${code} - details: ${errorData}`));
+          const errorMessage = errorData
+            ? `Python script exited with code ${code} - details: ${errorData}`
+            : `Python script exited with code ${code} - details: No error message received`;
+          reject(new Error(errorMessage));
         }
       });
       pythonProcess.on('error', (err) => {

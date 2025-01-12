@@ -2,6 +2,7 @@ import sys
 import json
 import os
 import re
+import traceback
 import io
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -55,15 +56,15 @@ def process_question(question):
                         answer = value
                         i += 1
                         while i < len(lines):
-                          next_line = lines[i].strip()
-                          if not next_line:
-                             i += 1
-                             continue
-                          if re.match(r"^(Câu trả lời:|Căn cứ:|Ngày ban hành:|Ngày cập nhật:|Đường dẫn căn cứ:|Đường dẫn các file cập nhật:)",next_line):
-                            break
-                          else:
-                            answer += "\n" + next_line
-                            i += 1
+                            next_line = lines[i].strip()
+                            if not next_line:
+                                i += 1
+                                continue
+                            if re.match(r"^(Câu trả lời:|Căn cứ:|Ngày ban hành:|Ngày cập nhật:|Đường dẫn căn cứ:|Đường dẫn các file cập nhật:)",next_line):
+                                break
+                            else:
+                                answer += "\n" + next_line
+                                i += 1
                         
                     elif current_key == "Căn cứ:":
                         source = value
@@ -72,16 +73,16 @@ def process_question(question):
                         issue_date = value
                         i+=1
                     elif current_key == "Ngày cập nhật:":
-                       update_date = value
-                       i+=1
+                        update_date = value
+                        i+=1
                     elif current_key == "Đường dẫn căn cứ:":
-                       source_path = value
-                       i+=1
+                        source_path = value
+                        i+=1
                     elif current_key == "Đường dẫn các file cập nhật:":
                         update_files_path = value
                         i+=1
                 else:
-                  i +=1
+                    i +=1
 
 
             formatted_results.append({
@@ -94,7 +95,10 @@ def process_question(question):
             })
         return  {"results": formatted_results}
     except Exception as e:
-        return {"error": str(e)}
+        error_message = f"Error processing question: {e} \n {traceback.format_exc()}"
+        print(json.dumps({"error": error_message}, ensure_ascii=False))
+        sys.stderr.write(error_message)
+        sys.exit(1)
 
 if __name__ == '__main__':
     input_json = json.loads(sys.argv[1])
