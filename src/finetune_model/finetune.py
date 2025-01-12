@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def finetune_and_save_model(data_path, output_dir):
+def finetune_and_save_model(data_path, output_dir, embedding_model = "sentence-transformers/all-MiniLM-L6-v2"):
     try:
         print("Start fine-tuning model...")
 
@@ -32,12 +32,12 @@ def finetune_and_save_model(data_path, output_dir):
             docs.append(doc)
 
         # Split the documents
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=500)
         splitted_docs = text_splitter.create_documents(docs)
 
         # Embedding model
         # Sử dụng HuggingFaceEmbeddings từ langchain-huggingface
-        embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        embeddings = HuggingFaceEmbeddings(model_name=embedding_model)
 
         # Create vector store
         vector_store = FAISS.from_documents(splitted_docs, embeddings)

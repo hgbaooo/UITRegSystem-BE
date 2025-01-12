@@ -16,7 +16,6 @@ const formSchema = new mongoose.Schema(
     },
     docxUrl: {
       type: String,
-      required: true,
     },
     formTypeId: {
       type: mongoose.Schema.Types.ObjectId,

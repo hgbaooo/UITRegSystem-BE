@@ -58,7 +58,6 @@ router.delete('/delete-form/:formId', auth('manageForms'), formController.delete
  *               - name
  *               - formTypeId
  *               - file
- *               - docxFile
  *             properties:
  *               name:
  *                 type: string

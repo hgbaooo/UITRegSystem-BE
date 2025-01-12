@@ -34,7 +34,7 @@ def process_question(question):
         
         qa_chain = RetrievalQA.from_llm(
             llm=model, 
-            retriever=vector_store.as_retriever(search_kwargs={'k': 5}),
+            retriever=vector_store.as_retriever(search_kwargs={'k': 4}),
             return_source_documents=True
             )
         result = qa_chain({"query": question})
