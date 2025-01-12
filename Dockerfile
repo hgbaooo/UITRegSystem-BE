@@ -31,8 +31,7 @@ RUN apt-get update && apt-get install -y python3 python3-pip && \
     
 # Install python dependencies in node image
 COPY --from=builder /usr/src/node-app/src/finetune_model/requirements.txt ./src/finetune_model/requirements.txt
-RUN pip3 install --break-system-packages -r src/finetune_model/requirements.txt
-
+RUN pip3 install  -r src/finetune_model/requirements.txt
 
 COPY --from=builder /usr/src/node-app .
 COPY --from=finetune /finetune_model/model_output ./src/finetune_model/model_output
