@@ -5,13 +5,12 @@ FROM node:20-bullseye AS builder
 WORKDIR /usr/src/node-app
 
 # Install system dependencies required by sharp
-RUN apt-get update && apt-get install -y \
- g++ \
- libvips-dev \
- make \
- python3 && \
- apt-get clean && rm -rf /var/lib/apt/lists/*
-
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    g++ \
+    libvips-dev \
+    make \
+    python3
+    
 # Copy package files and install dependencies
 COPY package*.json yarn.lock ./
 RUN yarn install --network-timeout 100000 --pure-lockfile
@@ -38,8 +37,8 @@ COPY --from=builder /usr/src/node-app/src/finetune_model/data_regulation.csv .
 RUN pip install --upgrade pip
 
 # Install dependencies for fine-tuning
-RUN apt-get update && apt-get install -y g++ gcc libffi-dev libgl1-mesa-glx && \
- pip install --break-system-packages -r requirements.txt
+RUN apt-get update && apt-get install -y --no-install-recommends g++ gcc libffi-dev libgl1-mesa-glx && \
+    pip install --break-system-packages -r requirements.txt
 
 # Run the fine-tuning script
 RUN python finetune.py
@@ -51,8 +50,8 @@ FROM node:20-bullseye
 WORKDIR /usr/src/node-app
 
 # Install Python and related tools
-RUN apt-get update && apt-get install -y python3 python3-pip && \
- apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Upgrade pip to the latest version
 RUN pip3 install --upgrade pip
