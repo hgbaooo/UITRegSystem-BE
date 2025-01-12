@@ -25,7 +25,6 @@ RUN pip install -r requirements.txt
 RUN which python3 > /tmp/python3_path.txt
 RUN python finetune.py
 
-
 FROM node:20-alpine
 
 WORKDIR /usr/src/node-app
@@ -34,12 +33,12 @@ RUN apk add --no-cache python3
 
 # Copy python executable from finetune stage
 COPY --from=finetune /tmp/python3_path.txt /tmp/python3_path.txt
-RUN PYTHON_PATH=$(cat /tmp/python3_path.txt) &&  cp "$PYTHON_PATH" /usr/bin/python3
+RUN PYTHON_PATH=$(cat /tmp/python3_path.txt) && cp "$PYTHON_PATH" /usr/bin/python3 && chmod +x /usr/bin/python3
+
 
 COPY --from=builder /usr/src/node-app .
 COPY --from=finetune /finetune_model/model_output ./src/finetune_model/model_output
 COPY --from=finetune /finetune_model/data_regulation.csv ./src/finetune_model/data_regulation.csv
-
 
 RUN yarn install --pure-lockfile
 
