@@ -26,6 +26,9 @@ FROM node:20-alpine
 WORKDIR /usr/src/node-app
 
 RUN apk add --no-cache python3
+# Install required python packages in node image
+COPY --from=builder /usr/src/node-app/src/finetune_model/requirements.txt ./src/finetune_model/requirements.txt
+RUN pip3 install -r src/finetune_model/requirements.txt
 
 COPY --from=builder /usr/src/node-app .
 COPY --from=finetune /finetune_model/model_output ./src/finetune_model/model_output
