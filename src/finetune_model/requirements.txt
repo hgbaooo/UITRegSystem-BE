@@ -1,7 +1,11 @@
-langchain
-transformers
+langchain==0.1.0
+transformers==4.39.0
 faiss-cpu
 pandas
 python-dotenv
-langchain-community
-sentence-transformers
+langchain-huggingface==0.1.2
+langchain-community==0.0.19
+sentence-transformers==2.2.2
+torch==2.2.0+cpu
+torchvision==0.17.0+cpu
+torchaudio==2.2.0+cpu

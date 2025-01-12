@@ -5,7 +5,7 @@ import re
 import io
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain_community.llms import HuggingFaceHub
