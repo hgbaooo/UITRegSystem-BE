@@ -8,9 +8,11 @@ async function askQuestion(question) {
     if (process.env.NODE_ENV === 'production') {
       const which = spawn('which', ['python3']);
       let whichData = '';
+
       which.stdout.on('data', (data) => {
         whichData += data.toString();
       });
+
       which.on('close', (code) => {
         if (code === 0) {
           pythonExecutable = whichData.trim();
@@ -73,11 +75,10 @@ async function askQuestion(question) {
             } catch (e) {
               reject(new Error(`Python script returned invalid JSON: ${e.message} - raw data: ${resultData} `));
             }
+          } else if (errorData) {
+            reject(new Error(`Python script exited with code ${code} - details: ${errorData}`));
           } else {
-            const errorMessage = errorData
-              ? `Python script exited with code ${code} - details: ${errorData}`
-              : `Python script exited with code ${code} - details: No error message received`;
-            reject(new Error(errorMessage));
+            reject(new Error(`Python script exited with code ${code} - details: No error message received`));
           }
         });
         pythonProcess.on('error', (err) => {
@@ -109,11 +110,10 @@ async function askQuestion(question) {
           } catch (e) {
             reject(new Error(`Python script returned invalid JSON: ${e.message} - raw data: ${resultData} `));
           }
+        } else if (errorData) {
+          reject(new Error(`Python script exited with code ${code} - details: ${errorData}`));
         } else {
-          const errorMessage = errorData
-            ? `Python script exited with code ${code} - details: ${errorData}`
-            : `Python script exited with code ${code} - details: No error message received`;
-          reject(new Error(errorMessage));
+          reject(new Error(`Python script exited with code ${code} - details: No error message received`));
         }
       });
       pythonProcess.on('error', (err) => {
