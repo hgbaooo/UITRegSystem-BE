@@ -4,9 +4,21 @@ require('dotenv').config();
 
 async function askQuestion(question) {
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn('python', [path.join(__dirname, './qa_service_helper.py'), JSON.stringify({ question })], {
-      cwd: path.join(__dirname, '..'),
-    });
+    let pythonExecutable;
+
+    if (process.env.NODE_ENV === 'production') {
+      pythonExecutable = '/usr/bin/python3'; // Path for Railway or linux system
+    } else {
+      pythonExecutable = 'python'; // Path for local or windows system
+    }
+
+    const pythonProcess = spawn(
+      pythonExecutable,
+      [path.join(__dirname, './qa_service_helper.py'), JSON.stringify({ question })],
+      {
+        cwd: path.join(__dirname, '..'),
+      }
+    );
 
     let resultData = '';
     let errorData = '';
