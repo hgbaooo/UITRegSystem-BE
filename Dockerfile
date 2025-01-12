@@ -19,14 +19,15 @@ COPY --from=builder /usr/src/node-app/src/finetune_model/requirements.txt .
 COPY --from=builder /usr/src/node-app/src/utils ./utils
 COPY --from=builder /usr/src/node-app/src/finetune_model .
 
-RUN apt-get update && apt-get install -y gcc g++ libffi-dev && \
+RUN apt-get update && apt-get install -y g++ gcc libffi-dev && \
     pip install -r requirements.txt && python finetune.py
 
 FROM node:20-bullseye
 
 WORKDIR /usr/src/node-app
 
-RUN apt-get update && apt-get install -y python3 python3-pip
+RUN apt-get update && apt-get install -y python3 python3-pip && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/src/node-app .
 
