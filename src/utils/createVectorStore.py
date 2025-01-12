@@ -18,7 +18,7 @@ def create_vector_store(data_path, embedding_model = "sentence-transformers/all-
           doc = f"Câu hỏi: {row['Câu hỏi']} \nCâu trả lời: {row['Câu trả lời']} \nCăn cứ: {row['Căn cứ']} \nNgày ban hành: {row['Ngày ban hành']} \nNgày cập nhật: {row['Ngày cập nhật']} \nĐường dẫn căn cứ: {row['Đường dẫn căn cứ']} \nĐường dẫn các file cập nhật: {row['Đường dẫn các file cập nhật']}"
           docs.append(doc)
         
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=50)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1800, chunk_overlap=600)
         splitted_docs = text_splitter.create_documents(docs)
 
         embeddings = HuggingFaceEmbeddings(model_name=embedding_model)

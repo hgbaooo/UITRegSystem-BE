@@ -29,12 +29,12 @@ def process_question(question):
         
         model = HuggingFaceHub(
             repo_id="google/flan-t5-base",
-            huggingfacehub_api_token = os.getenv("HUGGINGFACEHUB_API_KEY")
+            huggingfacehub_api_token = os.getenv("HUGGINGFACEHUB_API_KEY"),
           )
         
         qa_chain = RetrievalQA.from_llm(
             llm=model, 
-            retriever=vector_store.as_retriever(search_kwargs={'k': 4}),
+            retriever=vector_store.as_retriever(search_kwargs={'k': 3}),
             return_source_documents=True
             )
         result = qa_chain({"query": question})

@@ -10,12 +10,12 @@ def create_retrieval_qa_chain(vector_store, model_name = "google/flan-t5-base"):
     try:
         model = HuggingFaceHub(
             repo_id=model_name, 
-            huggingfacehub_api_token = os.getenv("HUGGINGFACEHUB_API_KEY")
+            huggingfacehub_api_token = os.getenv("HUGGINGFACEHUB_API_KEY"),
         )
         
         chain = RetrievalQA.from_llm(
           llm=model, 
-          retriever=vector_store.as_retriever(search_kwargs={'k': 5}),
+          retriever=vector_store.as_retriever(search_kwargs={'k': 3}),
           return_source_documents=True
         )
         return chain
